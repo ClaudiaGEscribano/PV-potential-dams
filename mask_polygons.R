@@ -11,10 +11,8 @@ data('worldMapEnv')
 
 ## la máscara debe ser SpainPolygons.
 
-a1 <- st_sf(1,geom = SpainPolygon)
-a2 <- st_sf(2,geom = SpainPolygon)
-
-ii <- rbind(a1, a2)
+## creo un objeto Spatial, para poder hacer la máscara al raster.
 
 
-a2  <- st_read(a1)
+sp  <- as(SpainPolygon "Spatial"))
+

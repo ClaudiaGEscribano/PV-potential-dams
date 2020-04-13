@@ -8,15 +8,59 @@ library(purrr)
 source('readdata.R')
 source('read_solar.R')
 
+## 1. Yearly PV from annual daily mean solar irradiation:
+
 ## GHI/DNI/DIF from the worldbank
 
 solar  <-  wbdata[1:3]
+temp   <- wbdata[7]
 
 ## GHI solar[3]
 
-levelplot(solar[3])
+levelplot(solar[[3]])
 
 levelplot(do.call(unlist, solar[3]))
 
 ## mask solar with reservoirs
 
+## la máscara de los polígonos puede hacerse directamente usando SpatialPolygons: sp.
+
+## As there is no reservoir data over the CI, I first reduce the extent of the solar data:
+
+ext <- c(-12, 7, 35.5,44)
+solar  <- lapply(solar, FUN=function(x) crop(x, ext))
+msolar  <- mask(solar[[3]], sp) ## mascara to calc pv
+spl  <- as(sp, "SpatialLines")
+
+levelplot(mask(solar[[3]], sp), margin=FALSE)+
+    layer(sp.lines(boundaries_lines))+
+    layer(sp.lines(spl, lwd=0.1, alpha=0.7))
+
+
+## zoom to look at the details:
+
+ext <- c(-5, 4, 38,40)
+solarZoom  <- lapply(solar, FUN=function(x) crop(x, ext))
+
+levelplot(mask(solarZoom[[3]], sp), margin=FALSE)+
+    layer(sp.lines(boundaries_lines))+
+    layer(sp.lines(spl, lwd=0.1, alpha=0.7))
+
+## calc pv:
+
+## Simple equation from annual daily mean irradiation.
+
+## PR = 0.8
+
+latLayer <- init(msolar, v='y') ## extraigo la latitud
+
+foo <- function(x, ...)
+{
+    gef <- calcGef(lat = x[1], dataRad = list(G0dm = x[2:13]))
+    result <- as.data.frameY(gef)[c('Gefd', 'Befd', 'Defd')] ##the results are yearly values
+    as.numeric(result)
+}
+
+
+gefS <- calc(stack(latLayer, msolar), foo, overwrite=TRUE)
+names(gefS) <- c('Gefd', 'Befd', 'Defd')##Three layers

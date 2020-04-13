@@ -93,10 +93,11 @@ boundaries_sp<- map2SpatialPolygons(boundaries, IDs=IDs, proj4string=crs.lonlat)
 
 ## transform sf objects into sp.
 sp <- as(SpainPolygon, "Spatial")
-
+ 
 R  <-  raster(extent(ext), crs=crs.lonlat, vals=rep(1,100))
  
 levelplot(R)+
-    layer(sp.polygons(boundaries_lines))+
+    layer(sp.lines(boundaries_lines))+
     layer(sp.polygons(sp))
- 
+
+levelplot(R) + layer(sp.polygons(sp))
