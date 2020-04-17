@@ -43,6 +43,8 @@ boundaries_sp<- map2SpatialPolygons(boundaries,
 boundaries_lines <- map2SpatialLines(boundaries,
                                proj4string = crs.lonlat)
 
+save(boundaries_lines, file='border.Rdata')
+
 ############################
 ## PI + baleares
  

@@ -1,4 +1,4 @@
-## read solar data.
+## read solar data. ## Solar data shoud be read from cmsaf. There is no monthly data in the worldbank dataset.
 
 library(raster)
 library(rasterVis)
@@ -16,4 +16,5 @@ wbdata  <-  lapply(1:length(files),
 ## GHI (daily mean)
 
 levelplot(wbdata[[3]])
+
 

@@ -3,6 +3,7 @@
 library(maps)
 library(mapdata)
 library(maptools)
+library(sp)
 
 source("readdata.R")
 
@@ -14,5 +15,5 @@ data('worldMapEnv')
 ## creo un objeto Spatial, para poder hacer la máscara al raster.
 
 
-sp  <- as(SpainPolygon "Spatial"))
+sp  <- as(SpainPolygon, "Spatial")
 

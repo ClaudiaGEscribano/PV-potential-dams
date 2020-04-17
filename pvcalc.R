@@ -7,7 +7,9 @@ library(purrr)
 
 source('readdata.R')
 source('read_solar.R')
+source('mask_polygons.R')
 
+load('border.Rdata')
 ## 1. Yearly PV from annual daily mean solar irradiation:
 
 ## GHI/DNI/DIF from the worldbank
@@ -39,20 +41,21 @@ levelplot(mask(solar[[3]], sp), margin=FALSE)+
 
 ## zoom to look at the details:
 
-ext <- c(-5, 4, 38,40)
+ext <- c(3, 3.3, 39.3,39.5)
 solarZoom  <- lapply(solar, FUN=function(x) crop(x, ext))
 
 levelplot(mask(solarZoom[[3]], sp), margin=FALSE)+
     layer(sp.lines(boundaries_lines))+
     layer(sp.lines(spl, lwd=0.1, alpha=0.7))
 
-## calc pv:
+## calc pv (to the croped region for testing):
 
 ## Simple equation from annual daily mean irradiation.
 
 ## PR = 0.8
+msz  <- mask(solarZoom[[3]], sp) ## there aren't reservoirs in this section
+latLayer <- init(msz, v='y') ## extraigo la latitud
 
-latLayer <- init(msolar, v='y') ## extraigo la latitud
 
 foo <- function(x, ...)
 {
@@ -62,5 +65,5 @@ foo <- function(x, ...)
 }
 
 
-gefS <- calc(stack(latLayer, msolar), foo, overwrite=TRUE)
+gefS <- calc(stack(latLayer, msz), foo, overwrite=TRUE)
 names(gefS) <- c('Gefd', 'Befd', 'Defd')##Three layers
